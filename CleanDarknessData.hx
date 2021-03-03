@@ -64,7 +64,8 @@ class CleanDarknessData extends FlxSprite
 				lholder = cast GroupManager.lightEmitterGroup.members[currentLightHolderIndex];
 			}
 			
-			if (lholder == null || currentLightHolderIndex > GroupManager.lightEmitterGroup.members.length)
+			//if we have run out of lightHolders to read from, simply place transparent pixels. 
+			if (currentLightHolderIndex > GroupManager.lightEmitterGroup.members.length)
 			{
 				pixels.setPixel32(i, 0, 0);
 				pixels.setPixel32(i, 1, 0);
@@ -90,7 +91,6 @@ class CleanDarknessData extends FlxSprite
 				//colordata holds the actual color of the light for blending. The alpha value here is unused, but could be used for something like the rate of the light fallout!
 				var colorData = (255 << 24) | (lholder.lightColor[0] << 16) | (lholder.lightColor[1] << 8) | lholder.lightColor[2];
 				
-				
 				pixels.setPixel32(i, 0, color);
 				pixels.setPixel32(i, 1, colorData);
 				
@@ -104,20 +104,17 @@ class CleanDarknessData extends FlxSprite
 			
 		}
 		
-		//The last two pixels are reserved for determining the background color of the lights - for a night scene, for instance, you would want 
-		var r = Math.round(brightness * 255);
+		//The last two pixels are reserved for determining the color of the darkness - for a night scene, for instance, you would want something like 0, 0, 50 for a slight blue tinge
+		//for a blood moon effect, you would want something more like 50, 0, 0
+		//and for a cave, 0, 0, 0. 
+		//The brightness variable here scales all three. A brightness of 1.0 means the shader does nothing, while a brightness of 0.5 will give a slight alpha to the darkness, and a brightness of 0.0 will mean anything not illuminated will be pitch black. 
+		var r = Math.round(brightness * 255); 
 		var g = Math.round(brightness * 255);
-		var b = Math.
-		var light = (255 << 24) | (Math.round(brightness * 255) << 16) | (Math.round(brightness * 255) << 8) | (Math.round(brightness * 255));
+		var b = Math.round(brightness * 255);
+		
+		var light = (255 << 24) | (r << 16) | (g << 8) | (b);
 		pixels.setPixel32(127, 0, light);
 		pixels.setPixel32(127, 1, light);
-		
-		scale.x = 40.0;
-		scale.y = 40.0;
-
-		//graphic.destroy();
-		//
-		//stamp(sprite, Math.round(player.getCenterXY().x - this.x), Math.round(player.getCenterXY().y - this.y));
 	}
 	
 }
